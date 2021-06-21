@@ -1,0 +1,308 @@
+/*posem les caracteristiques del body */
+body {
+    padding: 0;
+    margin: 0;
+    color: wheat;
+    font-family: Garamond;
+    background-color: black;
+}
+
+/*afegim la imatge de la paret amb un color de fons i el possem en no visible*/
+#paret {
+    background-color: #b2b2b2;
+    background-image: url("data:image/svg+xml,%3Csvg width='42' height='44' viewBox='0 0 42 44' xmlns='http://www.w3.org/2000/svg'%3E%3Cg id='Page-1' fill='none' fill-rule='evenodd'%3E%3Cg id='brick-wall' fill='%23727272' fill-opacity='1'%3E%3Cpath d='M0 0h42v44H0V0zm1 1h40v20H1V1zM0 23h20v20H0V23zm22 0h20v20H22V23z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 7%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    visibility: hidden;
+}
+
+/*posicionem el visor*/
+#visor {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+/*posicionem el terra*/
+#suelo {
+    width: 100%;
+    height: auto;
+    position: absolute;
+    bottom: 0;
+}
+
+
+#cont_fons {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+#cont_agulla {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+#fons {
+    align-self: center;
+    width: auto;
+    height: 150px;
+}
+/*posicionem la agulla*/
+#agulla {
+    align-self: center;
+    height: 150px;
+}
+/*posicionem la bruixula*/
+#brujula {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+/*col·loquem els stats*/
+#stats {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+/*col·loquem el mapa*/
+#mapa {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+/*fem la caixa del menu*/
+#menu {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background-color: rgb(170, 41, 18);
+    color: wheat;
+    border: none;
+    font-family: Garamond;
+    font-size: xx-large;
+}
+
+#mort {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: xx-large;
+    color: tomato;
+    font-weight: bolder;
+    visibility: hidden;
+}
+
+/*fem la caixa inical de nou jugador*/
+#menu_inicial {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    background-color: tomato;
+    width: 350px;
+    height: 350px;
+    padding: 50px;
+    justify-content: space-between;
+}
+
+/*lloc per introduir el nom*/
+#input_name {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    height: 200px;
+}
+
+label {
+    font-size: x-large;
+    font-weight: bold;
+}
+
+#name_field {
+    border: none;
+    background-color: rgb(250, 128, 107);
+    font-family: Garamond;
+    font-size: x-large;
+    color: rgb(170, 41, 18);
+    padding: 5px;
+}
+
+::placeholder {
+    color: rgb(170, 41, 18);
+    opacity: 1;
+}
+
+/*fem el boto*/
+#menu_boto {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    background-color: tomato;
+    width: 300px;
+    height: 300px;
+    padding: 50px;
+    justify-content: space-between;
+    /*visibility: hidden;*/
+    /*Canviar per veure el menu!!*/
+}
+
+.button_menu {
+    background-color: wheat;
+    color: rgb(170, 41, 18);
+    border: none;
+    font-family: Garamond;
+    font-size: x-large;
+    width: 75%;
+    align-self: center;
+    height: 40px;
+}
+/*titol del menu*/
+#titol_menu {
+    align-self: center;
+    font-size: xx-large;
+}
+
+/*col·loquem la imatge dels controls*/
+#controls {
+    width: 75%;
+    height: auto;
+    align-self: center;
+    margin-top: 10px;
+}
+
+
+/*Fem el boto del menu*/
+.drop-button {
+    background-color: #830000;
+    color: #fff;
+    padding: 15px;
+    border-radius: 5px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+.drop-button:hover, drop-buttton:hover {
+    background-color: #830000;
+}
+
+/*posicionem el contenidor*/
+.dropup {
+    display: inline-block;
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    padding: 0px 10px;
+    background-color: #830000;
+    border: none;
+    font-family: Garamond;
+    font-size: xx-large;
+}
+
+/*fem el submenu*/
+.dropup-content {
+    display: none;
+    position: absolute;
+    min-width: 40px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.331);
+    bottom: 50px;
+    z-index: 1;
+}
+
+.dropup-content a {
+    color: #ffdada80;
+    padding: 2px 2px;
+    display: block;
+}
+
+.dropup-content a:hover {
+    background-color: #e90000;
+}
+
+.show {
+    display: block;
+}
+
+/*posem unes caracteristiques depenent del boto*/
+#menu_borrar {
+    color: #830000;
+    display: block;
+    border: none;
+    padding: 10px 15px;
+}
+
+#menu_revivir {
+    color: #830000;
+    display: block;
+    border: none;
+    padding: 10px 17px;
+}
+
+#menu_nuevo {
+    color: #830000;
+    display: block;
+    border: none;
+    padding: 10px;
+}
+
+button.menu_b:hover {
+    background-color: wheat;
+}
+
+button {
+    font-family: Garamond;
+    font-weight: bold;
+}
+/*creem una grid per posar els stats*/
+.first {
+    display: grid;
+    grid-template-rows: 2% 70% 28%;
+    max-height: 10%;
+}
+
+/*fem la separacio dels elements*/
+.head {
+    display: grid;
+    grid-column-gap: 10px;
+    grid-template-columns: 1fr 2fr 1fr 2fr 1fr 2fr 1fr 2fr;
+}
+
+.menu_status {
+    display: flex;
+    justify-content: flex-start;
+    grid-row: 2;
+    padding-bottom: 15px;
+    background-color: #35343466;
+    border-radius: 5px;
+}
+
+/*caracteristiques del text*/
+.texto {
+    color: #f1f1f1;
+    font-size: 25px;
+}
+
+/*enemics morts*/
+#enemy {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    align-items: center;
+}

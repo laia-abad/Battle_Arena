@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ca">
+
+<head>
+    <!-- vinculem el html amb el css-->
+    <link rel="stylesheet" type="text/css" href="battle_arena.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Laia Abad, Silvia Miralles, Arnau Serra">
+    <meta name="description" content="battle_arena">
+    <meta name="date" content="01/01/2020">
+    <!-- vinculem el html amb el javascript-->
+    <script src="battle_arena.js"></script>
+    <title>Battle Arena</title>
+</head>
+
+<body>
+    <!-- posem les imatges del terra i de la paret-->
+    <div id="visor">
+        <img id="suelo" src="image/suelo.png" alt="suelo">
+        <div id="paret"></div>
+    </div>
+
+    <!-- creem la pestanya per registar jugadors-->
+    <div id="menu_inicial">
+
+        <div id="input_name">
+            <label>Introdueix el nom del teu personatge:</label>
+            <input type="text" placeholder="El nom del teu personatge..." id="name_field">
+            <!-- creem el boto començar el joc-->
+            <button type="submit" class="button_menu" onclick="startGame()" id="start_game">Start Game</button>
+        </div>
+        <!-- posem les fletxes que utilitza el jugador per moures-->
+        <img src="image/flechas2.png" id="controls" alt="Utilitza WASD per desplaçar-te i espai per a atacar." width="300"
+            height="200">
+    </div>
+    <!-- creem el menu-->
+    <div class="dropup">
+        <!-- fem una opcio perque es desplegui el menu-->
+        <button onclick="menu()" class="drop-button">MENU</button>
+        <!-- posem les opcion de borra, revivir i crear un nou jugador en el menu-->
+        <div id="myDropup" class="dropup-content">
+            <button onclick="deletePlayer()" id="menu_borrar" class="menu_b">Eliminar jugador</button>
+            <button onclick="revivir()" id="menu_revivir" class="menu_b">Revivir jugador</button>
+            <button onclick="nuevo('menu_inicial')" id="menu_nuevo" class="menu_b">Nuevo jugador</button>
+        </div>
+    </div>
+    <div id="HUD">
+        <!-- col·loquem la bruixula-->
+        <div id="brujula">
+            <div id="cont_fons"><img src="image/brujula.png" id="fons" alt="Bruixula"></div>
+            <div id="cont_agulla"><img src="image/aguja.png" id="agulla" alt="Direcció de la bruixula"></div>
+        </div>
+        <!-- fem la barra de dalt per els estats del jugador i nombre de enemics morts-->
+        <div id="stats">
+            <div class="first">
+                <div class="menu_status">
+                    <div class="head">
+                        <!-- posem les icones de cada element amb espai per la informacio que ens proporciona la api-->
+                        <img  src="image/corazon_blanco.png" alt="corazon" width="30" height="30">
+                        <label id="vitalpoints" class="texto"></label>
+
+                        <img  src="image/espada_blanca.png" alt="espada" width="30" height="30">
+                        <label id="attack" class="texto"></label>
+
+                        <img  src="image/escudo_blanco.png" alt="escudo" width="30" height="30">
+                        <label id="defense" class="texto"></label>
+
+                        <img  src="image/calavera_blanca.png" alt="calavera" width="30" height="30">
+                        <label id="kills" class="texto"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--posem la imatge del enemic-->
+        <div id="enemy"></div>
+
+        <!-- col·loquem el mini mapa-->
+        <table id="mapa">
+            <tbody id="tbody"></tbody>
+        </table>
+
+    </div>
+    <!-- escribim que el jugador ha mort-->
+    <p id="mort">Has mort.</p>
+</body>
+
+
+</html>

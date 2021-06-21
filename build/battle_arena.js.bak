@@ -1,0 +1,623 @@
+var group_token = "b89f96ae";
+
+class Player {
+  token;
+  code;
+  nombre;
+  attack;
+  defense;
+  direction;
+  image;
+  name;
+  object;
+  vitalpoints;
+  x;
+  y;
+
+  emptyPlayer() {
+    for (var i in this) {
+      this[i] = null;
+    }
+  }
+}
+
+var player = new Player;
+var matar_enemy;
+
+class Enemy {
+  image;
+  vitalpoints;
+  constructor(direction, x, y) {
+    this.direction = direction;
+    this.x = x;
+    this.y = y;
+
+  }
+  emptyEnemy() {
+    for (var i in this) {
+      this[i] = null;
+    }
+  }
+}
+
+var enemies_map = [];
+
+var enemies_close = [];
+
+var combat = false;
+
+var angle = 0;
+
+var directions = [];
+
+var dead = false;
+
+var audio = new Audio('error_sound.mp3');
+
+function setDirections() {
+  switch (player.direction) {
+    case "N":
+      directions = ["N", "O", "S", "E"];
+      break;
+    case "O":
+      directions = ["O", "S", "E", "N"];
+      break;
+    case "S":
+      directions = ["S", "E", "N", "O"];
+      break;
+    case "E":
+      directions = ["E", "N", "O", "S"];
+      break;
+  }
+}
+
+function startGame() {
+  var name = document.getElementById('name_field');
+  spawnPlayer(name.value);
+  console.log(name.value);
+  menu_inicial.style.visibility = "hidden";
+  name.value = '';
+}
+
+function spawnPlayer(nombre) {
+  console.log("spawn");
+  let url = "http://battlearena.danielamo.info/api/spawn/" + group_token + "/" + nombre;
+  fetch(url, {
+    method: 'GET'
+  })
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (json) {
+      player.token = json.token;
+      player.code = json.code;
+      player.nombre = nombre;
+      console.log(json);
+    })
+    .then(function () {
+      getPlayer(player.token);
+      update();
+    })
+}
+
+function removePlayer(token, code) {
+  var ajaxSYNC = function (url) {
+    var request = function request(url) {
+      var xhr = new XMLHttpRequest();
+      xhr.open("DELETE", url, false);
+      return xhr.responseText;
+    }
+
+    return {
+      request: request
+    }
+  }();
+  ajaxSYNC.request("http://battlearena.danielamo.info/api/remove/b89f96ae/" + token + "/" + code);
+  console.log("player removed.")
+}
+
+
+function getPlayer(token) {
+  let url = "http://battlearena.danielamo.info/api/player/" + group_token + "/" + token;
+  fetch(url, {
+    method: 'GET'
+  })
+    .then(function (response) {
+      console.log(response.status);
+      return response.json();
+    })
+    .then(function (json) {
+      player.attack = json.attack;
+      player.defense = json.defense;
+      player.direction = json.direction;
+      player.image = json.image;
+      player.name = json.name;
+      player.object = json.object;
+      player.vitalpoints = json.vitalpoints;
+      player.x = json.x;
+      player.y = json.y;
+      console.log(json);
+      document.getElementById('vitalpoints').innerHTML = player.vitalpoints;
+      document.getElementById('attack').innerHTML = player.attack;
+      document.getElementById('defense').innerHTML = player.defense;
+      setDirections();
+    })
+}
+
+function respawnPlayer(token) {
+  let url = "http://battlearena.danielamo.info/api/respawn/" + group_token + "/" + token;
+  fetch(url, {
+    method: 'GET'
+  });
+}
+
+function getPlayersAndObjects(token) {
+  let url = "http://battlearena.danielamo.info/api/playersobjects/" + group_token + "/" + token;
+  fetch(url, {
+    method: 'GET'
+  })
+    .then(function (response) {
+      console.log(response.status);
+      return response.json();
+    })
+    .then(function (json) {
+      console.log(json);
+      for (let i = 0; i < enemies_close.length; i++) {
+        enemies_close[i].emptyEnemy();
+      }
+      for (let i = 0; i < json.enemies.length; i++) {
+        enemies_close[i] = new Enemy;
+        enemies_close[i].vitalpoints = json.enemies[i].vitalpoints;
+        enemies_close[i].image = json.enemies[i].image;
+        enemies_close[i].direction = json.enemies[i].direction;
+        enemies_close[i].x = json.enemies[i].x;
+        enemies_close[i].y = json.enemies[i].y;
+      }
+    })
+    .then(function () {
+      makeMap();
+    });
+}
+
+function getMap(token) {
+  let url = "http://battlearena.danielamo.info/api/map/b89f96ae/" + token;
+  fetch(url, {
+    method: 'GET'
+  })
+    .then(function (response) {
+      console.log(response.status);
+      return response.json();
+    })
+    .then(function (json) {
+      console.log(json);
+      for (let i = 0; i < enemies_map.length; i++) {
+        enemies_map[i].emptyEnemy();
+      }
+      for (let i = 0; i < json.enemies.length; i++) {
+        var new_enemy = new Enemy(json.enemies[i].direction, json.enemies[i].x, json.enemies[i].y);
+        enemies_map.push(new_enemy);
+      }
+    })
+    .then(function () {
+      getPlayersAndObjects(player.token);
+    });
+}
+
+function movePlayer(token, direccion) {
+  let url = "http://battlearena.danielamo.info/api/move/b89f96ae/" + token + "/" + direccion;
+  fetch(url, {
+    method: 'GET'
+  })
+    .then(function () {
+      getPlayersAndObjects(player.token);
+      getPlayer(player.token);
+    });
+}
+
+function attackEnemy(token, direccion) {
+  let url = "http://battlearena.danielamo.info/api/attack/b89f96ae/" + token + "/" + direccion;
+  fetch(url, {
+    method: 'GET'
+  })
+    .then(function (response) {
+      console.log(response.status);
+      return response.json();
+    })
+    .then(function (json) {
+      console.log("send");
+      console.log(json);
+      console.log(matar_enemy);
+      matar_enemy.vitalpoints = matar_enemy.vitalpoints - json;
+      console.log(matar_enemy.vitalpoints);
+    });
+}
+
+function checkParet() {
+  if (player.x == 0 && player.direction == "O" || player.x == 40 && player.direction == "E" || player.y == 0 && player.direction == "S" || player.y == 40 && player.direction == "N") {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+function makeMap() {
+  var table = document.getElementById("mapa");
+  var tbody = table.createTBody();
+  var old_tbody = document.getElementById("tbody");
+  table.replaceChild(tbody, old_tbody);
+  tbody.setAttribute("id", "tbody");
+  for (let i = 0; i < 5; i++) {
+    var new_row = tbody.insertRow(0);
+    for (let j = 0; j < 5; j++) {
+      var casella = new_row.insertCell(-1);
+      casella.setAttribute("id", "x" + j + "y" + i);
+      casella.style.width = "30px";
+      casella.style.height = "30px";
+      let full = true; ////////////////////////////////////////////////////////////////////////////////////////////////
+
+      /*if (j > 2 && parseInt(player.x) + parseInt(j) <= 40) {
+        if (i > 2 && parseInt(player.x) + parseInt(j) <= 40) {
+          full = true;
+        } else if (i - player.y >= 0) {
+          full = true;
+        }
+      } else if (j - player.x >= 0){
+        if (i > 2 && parseInt(player.y) + parseInt(i) <= 40) {
+          full = true;
+        } else if (i - player.y >= 0) {
+          full = true;
+        }
+      }*/
+      if (full) {
+        var empty = document.createElement("img");
+        empty.src = "minimapa.png";
+        empty.style.width = "30px";
+        empty.style.height = "30px";
+        empty.style.marginBottom = "none";
+        casella.appendChild(empty);
+
+      }
+      if (i == 2 && j == 2) {
+        var player_img = document.createElement("img");
+        switch (player.direction) {
+          case "N":
+            player_img.src = "player_N.png";
+            break;
+          case "O":
+            player_img.src = "player_O.png";
+            break;
+          case "S":
+            player_img.src = "player_S.png";
+            break;
+          case "E":
+            player_img.src = "player_E.png";
+            break;
+        }
+        player_img.style.width = "30px";
+        player_img.style.height = "30px";
+        player_img.style.position = "absolute";
+        player_img.style.top = "50%";
+        player_img.style.left = "50%";
+        player_img.style.transform = "translate(-50%, -50%)";
+        casella.appendChild(player_img);
+      }
+      for (let n = 0; n < enemies_map.length; n++) {
+        if (j == enemies_map[n].x - player.x + 2 && i == enemies_map[n].y - player.y + 2) {
+          var enemy = document.createElement("img");
+          var enemy_cont = document.createElement("div");
+          if (j == 2 && i == 2) {
+            enemy.src = "enemy_tiny.png";
+
+          } else {
+            enemy.src = "enemy.png";
+          }
+          enemy.style.width = "30px";
+          enemy.style.height = "30px";
+          enemy.style.position = "absolute";
+          if (full) {
+            enemy.style.transform = "translate(0%, -110%)";
+          }
+          enemy_cont.style.position = "absolute";
+          enemy_cont.style.margin = "none";
+          enemy_cont.style.width = "30px";
+          enemy_cont.style.height = "30px";
+          enemy_cont.appendChild(enemy);
+          casella.appendChild(enemy_cont);
+        }
+      }
+    }
+  }
+}
+
+function displayEnemy() {
+  for (let i = 0; i < enemies_close.length; i++) {
+    console.log("enemy loc: (" + enemies_close[i].x + ", " + enemies_close[i].y + ") player loc and dir: (" + player.x + ", " + player.y + " / " + player.direction);
+    if (((enemies_close[i].x == player.x + 1 && enemies_close[i].y == player.y && player.direction == "E") ||
+      (enemies_close[i].x == player.x - 1 && enemies_close[i].y == player.y && player.direction == "O") ||
+      (enemies_close[i].x == player.x && enemies_close[i].y == player.y + 1 && player.direction == "N") ||
+      (enemies_close[i].x == player.x && enemies_close[i].y == player.y - 1 && player.direction == "S"))) {
+      if (enemies_close[i].vitalpoints > 0) {
+        var enemy = document.createElement("img");
+        enemy.id = "enemy_img";
+        enemy.src = "characters/my_character-" + enemies[i].image + ".png";
+        //enemy.style.position = "absolute";
+        //enemy.style.top = "50%";
+        //enemy.style.left = "50%";
+        //enemy.style.transform = "translate(-50%, -50%)";
+        let parent = document.getElementById("enemy");
+        parent.appendChild(enemy);
+        //var enemy = document.createElement("p");
+        //mirar error(); i fer hitpoints amb aixo
+        //fer barra(?) o mostrar punts de vida que li queden o algo
+        combat = true;
+        matar_enemy = enemies_close[i];
+      } else {
+        alert("aquest enemic ja esta mort ¯\\_(ツ)_/¯");
+      }
+    }
+  }
+}
+
+
+window.addEventListener("keydown", function (event) {
+  let bruixula = document.getElementById("agulla");
+  let paret = document.getElementById("paret");
+  let suelo = document.getElementById("suelo");
+  if (!combat || dead) {
+    switch (event.code) {
+      case "ArrowLeft":
+        console.log("left");
+        let left = directions.shift();
+        directions.push(left);
+        player.direction = directions[0];
+        angle -= 90;
+        bruixula.style.transform = "rotate(" + angle + "deg)";
+        displayEnemy();
+        if (combat) {
+          combat = false;
+          var enemy = document.getElementById("enemy");
+          var enemy_img = document.getElementById("enemy_img");
+          enemy.removeChild(enemy_img);
+        }
+        if (checkParet()) {
+          paret.style.visibility = "visible";
+          suelo.style.visibility = "hidden";
+        } else {
+          paret.style.visibility = "hidden";
+          suelo.style.visibility = "visible";
+        }
+        break;
+      case "ArrowRight":
+        console.log("right");
+        let right = directions.pop();
+        directions.unshift(right);
+        player.direction = directions[0];
+        angle += 90;
+        bruixula.style.transform = "rotate(" + angle + "deg)";
+        displayEnemy();
+        if (combat) {
+          combat = false;
+          var enemy = document.getElementById("enemy");
+          var enemy_img = document.getElementById("enemy_img");
+          enemy.removeChild(enemy_img);
+        }
+        if (checkParet()) {
+          paret.style.visibility = "visible";
+          suelo.style.visibility = "hidden";
+        } else {
+          paret.style.visibility = "hidden";
+          suelo.style.visibility = "visible";
+        }
+        break;
+      case "ArrowUp":
+        console.log("up");
+        if (combat) {
+          combat = false;
+          var enemy = document.getElementById("enemy");
+          var enemy_img = document.getElementById("enemy_img");
+          enemy.removeChild(enemy_img);
+        }
+        if (checkParet()) {
+          paret.style.visibility = "visible";
+          suelo.style.visibility = "hidden";
+        } else {
+          paret.style.visibility = "hidden";
+          suelo.style.visibility = "visible";
+          movePlayer(player.token, player.direction);
+          displayEnemy();
+        }
+        break;
+      case "ArrowDown":
+        console.log("down");
+        if (combat) {
+          combat = false;
+          var enemy = document.getElementById("enemy");
+          var enemy_img = document.getElementById("enemy_img");
+          enemy.removeChild(enemy_img);
+        }
+        if (checkParet()) {
+          paret.style.visibility = "visible";
+          suelo.style.visibility = "hidden";
+        } else {
+          paret.style.visibility = "hidden";
+          suelo.style.visibility = "visible";
+          movePlayer(player.token, player.direction);
+          displayEnemy();
+        }
+        break;
+    }
+
+  } else {
+    if (matar_enemy.vitalpoints <= 0) {
+      combat = false;
+      var enemy = document.getElementById("enemy");
+      var enemy_img = document.getElementById("enemy_img");
+      enemy.removeChild(enemy_img);
+    }
+
+    if (event.code == "Space") {
+      attackEnemy(player.token, player.direccion);
+
+    }
+  }
+}, true);
+
+//menu
+function menu() {
+  document.getElementById("myDropup").classList.toggle("show");
+}
+
+//revivir al jugador
+function revivir() {
+  respawnPlayer(player.token);
+  getPlayer(player.token);
+  console.log("revivir");
+}
+
+//remove player
+function removeplayer() {
+  if (player.token != null) {
+    removePlayer(player.token, player.code);
+    player.emptyPlayer();
+    console.log(player);
+    console.log("remove");
+    var table = document.getElementById("mapa");
+    table.removeChild(tbody);
+    angle = 0;
+    let bruixula = document.getElementById("agulla");
+    bruixula.style.transform = "rotate(" + angle + "deg)";
+    document.getElementById('vitalpoints').innerHTML = "";
+    document.getElementById('attack').innerHTML = "";
+    document.getElementById('defense').innerHTML = "";
+  } else {
+    error("There's no player.");
+    console.log("there's no player");
+  }
+}
+
+function error(message) {
+  var text = document.createElement("p");
+  text.style.position = "absolute";
+  text.style.bottom = "70px";
+  text.style.textAlign = "center";
+  text.style.color = "red";
+  text.style.fontFamily = "Garamond";
+  text.innerHTML = message;
+  text.style.width = "100%";
+  text.style.fontSize = "xx-large";
+  text.style.fontWeight = "bolder";
+  document.body.appendChild(text);
+  fade(text);
+  audio.play();
+}
+
+function fade(element) {
+  var op = 1;
+  var timer = setInterval(function () {
+    if (op <= 0.1) {
+      clearInterval(timer);
+      element.parentElement.removeChild(element);
+    }
+    element.style.opacity = op;
+    element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+    op -= op * 0.1;
+  }, 100);
+}
+
+function flicker() {} /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//Funcion que oculta la pestaña de menu inicial
+function nuevo(menu_inicial) {
+  if (player.token == null) {
+    var mi = document.getElementById(menu_inicial);
+    if (mi.style.visibility == "hidden") {
+      mi.style.visibility = 'visible';
+    }
+  } else {
+    console.log("there's already a player");
+    error("There can't be two players at once.");
+  }
+}
+
+//Cierre del submenu cuando salimos del menu
+window.onclick = function (event) {
+  if (!event.target.matches('.drop-button')) {
+    var dropup = document.getElementsByClassName("dropup-content");
+    var i;
+    for (i = 0; i < dropup.length; i++) {
+      var openDropup = dropup[i];
+      if (openDropup.classList.contains('show')) {
+        openDropup.classList.remove('show');
+      }
+    }
+  }
+}
+
+function update() {
+  var interval;
+  if (player.token != null) {
+    getMap(player.token);
+    getPlayer(player.token);
+    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+    //interval = setInterval(update, 1000);
+  } else {
+    clearInterval(interval);
+  }
+  if (player.vitalpoints < 0 && dead == false) {
+    console.log("you dead");
+    dead = true;
+  }
+}
+
+
+/***************************************************************************************************************************************/
+/*
+class Object {
+  token;
+  x;
+  y;
+  constructor(nombre, image, attack, defense) {
+    this.nombre = nombre;
+    this.image = image;
+    this.attack = attack;
+    this.defense = defense;
+  }
+}
+
+function craftObject(name, image, attack, defense, token) {
+  function reqListener () {
+      if (this.readyState === XMLHttpRequest.DONE && this.status === 201) {
+          var Data = JSON.parse(this.responseText);
+          console.log(Data);
+      }
+  }
+
+
+  var ajaxASYNC = {
+      request: function (url){
+          var xhr = new XMLHttpRequest();
+          xhr.addEventListener("load", reqListener);
+          xhr.open("POST", url, true);
+          xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+          xhr.send(JSON.stringify({ "name": name, "image": image, "attack": attack, "defense": defense }));
+      }
+  };
+  ajaxASYNC.request("http://battlearena.danielamo.info/api/craft/" + group_token + "/" + token);
+}
+
+function pickupObject(group_token, token) {
+  let url = "http://battlearena.danielamo.info/api/pickup/b89f9553/b89f9553/b89f96ae/" + token;
+  fetch(url, {
+    method: 'GET'
+  })
+    .then(function (response) {
+      console.log(response.status);
+      return response.json();
+    })
+    .then(function (json) {
+      alert(json.name);
+      //fer coses
+    });
+}*/
+

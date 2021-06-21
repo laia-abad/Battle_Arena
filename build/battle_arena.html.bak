@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ca">
+
+<head>
+    <link rel="stylesheet" type="text/css" href="battle_arena.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Laia Abad, Silvia Miralles, Arnau Serra">
+    <meta name="description" content="battle_arena">
+    <meta name="date" content="01/01/2020">
+    <script src="battle_arena.js"></script>
+    <title>Battle Arena</title>
+</head>
+
+<body>
+    <div id="paret"></div>
+    <div id="visor">
+        <img id="suelo" src="suelo.png" alt="suelo">
+    </div>
+    
+    <div id="menu_inicial">
+        
+        <div id= "input_name">
+            <label for="name">Introdueix el nom del teu personatge:</label>
+            <input type="text" placeholder ="nombre" id="name_field">
+            <br>
+            <button type="submit" class="button_menu" onclick="startGame()" id="start_game">Start Game</button>
+        </div>
+
+        <img src="flechas2.png" id="controls" alt="Utilitza WASD per desplaçar-te i espai per a atacar." width="300"
+            height="200">
+    </div>
+    
+    <div class="dropup">
+        <button onclick="menu()" class="drop-button">MENU</button>
+       <div id="myDropup" class="dropup-content">
+         <a > <button onclick="removeplayer()" class= "menu_borrar" >BORRAR</button></a>
+         <a > <button onclick="revivir()" class= "menu_revivir" >REVIVIR</button></a>
+         <a > <button onclick="nuevo('menu_inicial')" class= "menu_nuevo" >NUEVO JUGADOR</button></a>
+       </div>
+    </div>
+    <div id="HUD">
+        <div id="brujula">
+            <div id="cont_fons"><img src="brujula.png" id="fons" alt="Bruixula"></div>
+            <div id="cont_agulla"><img src="aguja.png" id="agulla" alt="Direcció de la bruixula"></div>
+        </div>
+        <div id="stats">
+            <div id="equipped_obj"></div>
+                <div class = "first">
+                <div class="menu_status">
+                    <div class="head">
+                        
+                            <img class="arrow" src="SVG/corazon_blanco.png" alt="Arrow1" width="30" height="30">
+                            <label id="vitalpoints" class = "texto"></label>
+
+                            <img class="arrow" src="SVG/espada_blanca.png" alt="Arrow2" width="30" height="30">
+                            <label id="attack" class = "texto"></label>
+                           
+                            <img class="arrow" src="SVG/escudo_blanco.png" alt="Arrow1" width="30" height="30">
+                            <label id="defense" class = "texto"></label>
+
+                            <img class="arrow" src="SVG/calavera_blanca.png" alt="Arrow1" width="30" height="30">
+                            <label id="defense" class = "texto"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="enemy"></div>
+
+         <table id="mapa">
+            <tbody id="tbody"></tbody>
+        </table>
+
+    </div>
+    <p id="mort">Has mort.</p>
+
+</body>
+
+
+</html>
